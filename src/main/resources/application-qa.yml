@@ -1,0 +1,9 @@
+spring:
+  config:
+    import: classpath:application-mysql.yml
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    open-in-view: false

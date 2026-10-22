@@ -1,0 +1,6 @@
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/secure_auth_gateway?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+    username: secure_auth_user
+    password: secure_auth_user_password@123
+    driver-class-name: com.mysql.cj.jdbc.Driver

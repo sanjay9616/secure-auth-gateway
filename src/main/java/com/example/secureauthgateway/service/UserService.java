@@ -4,6 +4,8 @@ import com.example.secureauthgateway.dto.UserRequest;
 import com.example.secureauthgateway.dto.UserResponse;
 import com.example.secureauthgateway.entity.User;
 import com.example.secureauthgateway.repository.UserRepository;
+
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -12,9 +14,14 @@ import java.util.List;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public UserService(UserRepository userRepository) {
+    public UserService(
+            UserRepository userRepository,
+            PasswordEncoder passwordEncoder) {
+
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public UserResponse createUser(UserRequest request) {
@@ -26,7 +33,7 @@ public class UserService {
         User user = new User();
 
         user.setEmail(request.getEmail());
-        user.setPassword(request.getPassword());
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setRole(request.getRole());
 
         User savedUser = userRepository.save(user);
@@ -45,9 +52,7 @@ public class UserService {
     public UserResponse getUserById(Long id) {
 
         User user = userRepository.findById(id)
-                .orElseThrow(() ->
-                        new RuntimeException("User not found with id: " + id)
-                );
+                .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
 
         return mapToResponse(user);
     }
@@ -55,12 +60,10 @@ public class UserService {
     public UserResponse updateUser(Long id, UserRequest request) {
 
         User user = userRepository.findById(id)
-                .orElseThrow(() ->
-                        new RuntimeException("User not found with id: " + id)
-                );
+                .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
 
         user.setEmail(request.getEmail());
-        user.setPassword(request.getPassword());
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setRole(request.getRole());
 
         User updatedUser = userRepository.save(user);

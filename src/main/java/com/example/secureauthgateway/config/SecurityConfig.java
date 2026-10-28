@@ -49,9 +49,9 @@ public class SecurityConfig {
                 .authenticationProvider(authenticationProvider())
                 .authorizeHttpRequests(auth -> auth.requestMatchers(
                     org.springframework.http.HttpMethod.POST,
-                    "/api/auth/signup")
-                .permitAll()
-                .requestMatchers("/login").permitAll()
+                    "/api/auth/signup",
+                    "/api/auth/login"
+                ).permitAll()
                 .requestMatchers("/users/**").permitAll()
                 .anyRequest().authenticated());
 

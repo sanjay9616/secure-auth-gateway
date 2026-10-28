@@ -1,6 +1,7 @@
 
 package com.example.secureauthgateway.controller;
 
+import com.example.secureauthgateway.dto.LoginRequest;
 import com.example.secureauthgateway.dto.SignupRequest;
 import com.example.secureauthgateway.dto.UserResponse;
 import com.example.secureauthgateway.service.AuthService;
@@ -30,5 +31,14 @@ public class AuthController {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(response);
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<String> login(
+            @Valid @RequestBody LoginRequest request) {
+
+        authService.login(request);
+
+        return ResponseEntity.ok("Login successful");
     }
 }

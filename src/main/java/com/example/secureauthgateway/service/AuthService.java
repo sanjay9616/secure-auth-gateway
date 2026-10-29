@@ -2,6 +2,7 @@
 package com.example.secureauthgateway.service;
 
 import com.example.secureauthgateway.dto.LoginRequest;
+import com.example.secureauthgateway.dto.LoginResponse;
 import com.example.secureauthgateway.dto.SignupRequest;
 import com.example.secureauthgateway.dto.UserResponse;
 import com.example.secureauthgateway.entity.Role;
@@ -22,15 +23,18 @@ public class AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
+    private final JwtService jwtService;
 
     public AuthService(
-        UserRepository userRepository,
-        PasswordEncoder passwordEncoder,
-        AuthenticationManager authenticationManager) {
-            this.userRepository = userRepository;
-            this.passwordEncoder = passwordEncoder;
-            this.authenticationManager = authenticationManager;
-        }
+    UserRepository userRepository,
+    PasswordEncoder passwordEncoder,
+    AuthenticationManager authenticationManager,
+    JwtService jwtService) {
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.authenticationManager = authenticationManager;
+        this.jwtService = jwtService;
+    }
 
     @Transactional
     public UserResponse signup(SignupRequest request) {
@@ -62,7 +66,7 @@ public class AuthService {
         return response;
     }
 
-    public void login(LoginRequest request) {
+    public LoginResponse login(LoginRequest request) {
 
         authenticationManager.authenticate(
             new UsernamePasswordAuthenticationToken(
@@ -70,5 +74,11 @@ public class AuthService {
                 request.getPassword()
             )
         );
+
+        String token = jwtService.generateToken(
+            request.getEmail().trim()
+        );
+
+        return new LoginResponse(token, "Bearer");
     }
 }

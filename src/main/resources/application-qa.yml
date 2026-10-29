@@ -1,3 +1,4 @@
+
 spring:
   config:
     import: classpath:application-mysql.yml
@@ -7,8 +8,8 @@ spring:
       ddl-auto: update
     show-sql: true
     open-in-view: false
-  
-  security:
-    jwt:
-      secret: ${JWT_SECRET}
-      expiration-ms: 900000
+
+security:
+  jwt:
+    secret: TRTPEKTE84M7bS37BqRo1yDXGkHC7de1Er9N+/8vW2w=
+    expiration-ms: 900000

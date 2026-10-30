@@ -1,6 +1,8 @@
 
 package com.example.secureauthgateway.config;
 
+import com.example.secureauthgateway.security.AccessDeniedHandlerJwt;
+import com.example.secureauthgateway.security.AuthEntryPointJwt;
 import com.example.secureauthgateway.security.JwtAuthenticationFilter;
 import com.example.secureauthgateway.service.CustomUserDetailsService;
 
@@ -22,13 +24,19 @@ public class SecurityConfig {
     private final CustomUserDetailsService userDetailsService;
     private final PasswordEncoder passwordEncoder;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final AuthEntryPointJwt authEntryPointJwt;
+    private final AccessDeniedHandlerJwt accessDeniedHandlerJwt;
 
     public SecurityConfig(CustomUserDetailsService userDetailsService,
         PasswordEncoder passwordEncoder,
-        JwtAuthenticationFilter jwtAuthenticationFilter) {
+        JwtAuthenticationFilter jwtAuthenticationFilter,
+        AuthEntryPointJwt authEntryPointJwt,
+        AccessDeniedHandlerJwt accessDeniedHandlerJwt) {
             this.userDetailsService = userDetailsService;
             this.passwordEncoder = passwordEncoder;
             this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+            this.authEntryPointJwt = authEntryPointJwt;
+            this.accessDeniedHandlerJwt = accessDeniedHandlerJwt;
         }
 
     @Bean
@@ -53,6 +61,10 @@ public class SecurityConfig {
         http
             .csrf(csrf -> csrf.disable())
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .exceptionHandling(exception -> exception
+                .authenticationEntryPoint(authEntryPointJwt)
+                .accessDeniedHandler(accessDeniedHandlerJwt)
+            )
             .authenticationProvider(authenticationProvider())
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(
@@ -60,7 +72,7 @@ public class SecurityConfig {
                     "/api/auth/signup",
                     "/api/auth/login"
                 ).permitAll()
-                .requestMatchers("/users/**").authenticated()
+                .requestMatchers("/users/**").hasRole("ADMIN")
                 .anyRequest().authenticated()
             )
             .addFilterBefore(

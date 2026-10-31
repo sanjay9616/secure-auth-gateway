@@ -93,4 +93,12 @@ public class UserService {
 
         return response;
     }
+
+    public UserResponse getUserByEmail(String email) {
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found with email: " + email));
+
+        return mapToResponse(user);
+    }
 }

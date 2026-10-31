@@ -1,15 +1,12 @@
-
 spring:
-  config:
-    import: classpath:application-mysql.yml
-
-  jpa:
-    hibernate:
-      ddl-auto: update
-    show-sql: true
-    open-in-view: false
-
-security:
-  jwt:
-    secret: TRTPEKTE84M7bS37BqRo1yDXGkHC7de1Er9N+/8vW2w=
-    expiration-ms: 900000
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${GOOGLE_CLIENT_ID}
+            client-secret: ${GOOGLE_CLIENT_SECRET}
+            scope:
+              - openid
+              - profile
+              - email

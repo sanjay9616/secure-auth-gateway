@@ -4,6 +4,7 @@ package com.example.secureauthgateway.config;
 import com.example.secureauthgateway.security.AccessDeniedHandlerJwt;
 import com.example.secureauthgateway.security.AuthEntryPointJwt;
 import com.example.secureauthgateway.security.JwtAuthenticationFilter;
+import com.example.secureauthgateway.security.OAuth2LoginSuccessHandler;
 import com.example.secureauthgateway.service.CustomUserDetailsService;
 
 import org.springframework.context.annotation.Bean;
@@ -26,17 +27,20 @@ public class SecurityConfig {
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final AuthEntryPointJwt authEntryPointJwt;
     private final AccessDeniedHandlerJwt accessDeniedHandlerJwt;
+    private final OAuth2LoginSuccessHandler oauth2LoginSuccessHandler;
 
     public SecurityConfig(CustomUserDetailsService userDetailsService,
         PasswordEncoder passwordEncoder,
         JwtAuthenticationFilter jwtAuthenticationFilter,
         AuthEntryPointJwt authEntryPointJwt,
-        AccessDeniedHandlerJwt accessDeniedHandlerJwt) {
+        AccessDeniedHandlerJwt accessDeniedHandlerJwt,
+        OAuth2LoginSuccessHandler oauth2LoginSuccessHandler) {
             this.userDetailsService = userDetailsService;
             this.passwordEncoder = passwordEncoder;
             this.jwtAuthenticationFilter = jwtAuthenticationFilter;
             this.authEntryPointJwt = authEntryPointJwt;
             this.accessDeniedHandlerJwt = accessDeniedHandlerJwt;
+            this.oauth2LoginSuccessHandler = oauth2LoginSuccessHandler;
         }
 
     @Bean
@@ -60,7 +64,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             .csrf(csrf -> csrf.disable())
-            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
             .exceptionHandling(exception -> exception
                 .authenticationEntryPoint(authEntryPointJwt)
                 .accessDeniedHandler(accessDeniedHandlerJwt)
@@ -72,9 +76,14 @@ public class SecurityConfig {
                     "/api/auth/signup",
                     "/api/auth/login"
                 ).permitAll()
+                .requestMatchers("/oauth2/**", "/login/oauth2/**").permitAll()
                 .requestMatchers("/users/**").hasRole("ADMIN")
                 .anyRequest().authenticated()
             )
+            .oauth2Login(oauth2 -> oauth2
+                .successHandler(oauth2LoginSuccessHandler)
+            )
+
             .addFilterBefore(
                 jwtAuthenticationFilter,
                 UsernamePasswordAuthenticationFilter.class
